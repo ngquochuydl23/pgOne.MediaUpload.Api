@@ -27,35 +27,39 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-app.use('/media', express.static('uploads'));
+app.use('/media', express.static(path.join(__dirname, 'uploads')));
+
 
 app.post("/media/upload", upload.any(), function (req, res) {
     var files = req.files;
+
+    var media = files.map(file => ({
+        url: 'https://www.pgonevn.com/clould/media/' + file.filename,
+        mediaType: file.mimetype,
+    }));
+
     if (files) {
         res.send({
             statusCode: res.statusCode,
             result: {
-                media: files
+                media
             }
         })
     }
 });
 
-// enable files upload
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload({
     createParentPath: true
 }));
 
-//add other middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-//start app 
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 app.listen(port, () =>
     console.log(`App is listening on port ${port}.`)
